@@ -6,11 +6,11 @@ import "base:intrinsics"
 import "core:c"
 import "core:image/netpbm"
 
-USE_SYSTEM :: #config(USE_SYSTEM, true)
+SDL_NET_USE_SYSTEM :: #config(SDL_NET_USE_SYSTEM, true)
 
 when ODIN_OS == .Windows {
 	foreign import lib "SDL3_net.lib"
-} else when ODIN_OS == .Darwin && !USE_SYSTEM {
+} else when ODIN_OS == .Darwin && !SDL_NET_USE_SYSTEM {
 	foreign import lib "macos/libSDL3_net.dylib"
 } else {
 	foreign import lib "system:SDL3_net"
@@ -64,7 +64,7 @@ Server :: distinct rawptr
 @(default_calling_convention = "c", link_prefix = "NET_")
 foreign lib {
 	CreateServer :: proc(addr: ^Address, port: SDL.Uint16) -> ^Server ---
-	AcceptClient :: proc(server: ^Server, client_stream: [^]^StreamSocket) -> bool ---
+	AcceptClient :: proc(server: ^Server, client_stream: ^^StreamSocket) -> bool ---
 	DestroyServer :: proc(server: ^Server) ---
 
 	GetStreamSocketAddress :: proc(sock: ^StreamSocket) -> ^Address ---
@@ -93,5 +93,5 @@ foreign lib {
 	DestroyDatagram :: proc(dgram: ^Datagram) ---
 	SimulateDatagramPacketLoss :: proc(sock: DatagramSocket, percent_loss: c.int) ---
 	DestroyDatagramSocket :: proc(sock: ^DatagramSocket) ---
-	WaitUntilInputAvailable :: proc(vsockets: [^]rawptr, numsockets: c.int, timeout: SDL.Sint32) -> c.int ---
+	WaitUntilInputAvailable :: proc(vsockets: rawptr, numsockets: c.int, timeout: SDL.Sint32) -> c.int ---
 }
